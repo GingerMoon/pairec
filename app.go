@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/alibaba/pairec/config/shanda_config"
 	"github.com/alibaba/pairec/middleware/prometheus"
 
 	"github.com/alibaba/pairec/log"
@@ -34,6 +35,9 @@ func NewApp() *App {
 }
 
 func (app *App) Run() {
+	shanda_config.LoadConfig()
+	log.SetLogger()
+
 	mode := os.Getenv("RUN_MODE")
 	if mode == "COMMAND" {
 		return

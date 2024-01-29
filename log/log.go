@@ -3,32 +3,31 @@ package log
 import (
 	"fmt"
 
-	"github.com/golang/glog"
+	"go.uber.org/zap"
 )
 
+var (
+	zapLogger *zap.Logger
+)
+
+func SetLogger() {
+	zapLogger = NewLogger()
+}
+
 func Debug(msg string) {
-	glog.V(1).Info(fmt.Sprintf("[DEBUG]\t%s", msg))
+	zapLogger.Debug(msg)
 }
 func Info(msg string) {
-	glog.InfoDepth(1, fmt.Sprintf("[INFO]\t%s", msg))
-	if slsclient != nil {
-		sendLogToSLS("INFO", msg)
-	}
+	zapLogger.Info(msg)
 }
 func Warning(msg string) {
-	glog.InfoDepth(1, fmt.Sprintf("[WARNING]\t%s", msg))
-	if slsclient != nil {
-		sendLogToSLS("WARNING", msg)
-	}
+	zapLogger.Warn(msg)
 }
 func Error(msg string) {
-	glog.InfoDepth(1, fmt.Sprintf("[ERROR]\t%s", msg))
-	if slsclient != nil {
-		sendLogToSLS("ERROR", msg)
-	}
+	zapLogger.Error(msg)
 }
 func Flush() {
-	glog.Flush()
+
 }
 
 type ABTestLogger struct{}
