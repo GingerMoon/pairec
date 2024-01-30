@@ -79,19 +79,19 @@ func Run() {
 		configFile = exPath + "/conf/recommend_config_local.json"
 		if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
 			fmt.Printf("1 %s does not exist", configFile)
-		} else {
+
 			configFile = "recommend_config_local"
 			if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
 				fmt.Printf("2 %s does not exist", configFile)
-			} else {
+
 				configFile = "/opt/apps/a030-recommender/conf/recommend_config_local.json"
 				if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
 					fmt.Printf("3 %s does not exist", configFile)
-				} else {
+
 					configFile = "/opt/apps/a030-recommender/recommend_config_local.json"
 					if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
 						fmt.Printf("4 %s does not exist", configFile)
-					} else {
+
 						configFile = exPath + "/recommend_config_local.json"
 						if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
 							fmt.Printf("5 %s does not exist", configFile)
