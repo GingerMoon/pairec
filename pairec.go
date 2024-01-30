@@ -1,10 +1,13 @@
 package pairec
 
 import (
+	"errors"
 	"flag"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/alibaba/pairec/datasource/graph"
 	"github.com/alibaba/pairec/datasource/hbase_thrift"
@@ -60,6 +63,11 @@ func Run() {
 		flag.Parse()
 	}
 
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exPath := filepath.Dir(ex)
 	configName := os.Getenv("CONFIG_NAME")
 	// if CONFIG_NAME is set, so load the pairec config from abtest server
 	// first create the abtest client connect to the server use the env params
@@ -68,7 +76,31 @@ func Run() {
 		ListenConfig(configName)
 	} else {
 		// load config from local file
-		configFile = "./conf/recommend_config_local.json"
+		configFile = exPath + "/conf/recommend_config_local.json"
+		if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
+			fmt.Printf("1 %s does not exist", configFile)
+		} else {
+			configFile = "recommend_config_local"
+			if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
+				fmt.Printf("2 %s does not exist", configFile)
+			} else {
+				configFile = "/opt/apps/a030-recommender/conf/recommend_config_local.json"
+				if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
+					fmt.Printf("3 %s does not exist", configFile)
+				} else {
+					configFile = "/opt/apps/a030-recommender/recommend_config_local.json"
+					if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
+						fmt.Printf("4 %s does not exist", configFile)
+					} else {
+						configFile = exPath + "/recommend_config_local.json"
+						if _, err := os.Stat(configFile); errors.Is(err, os.ErrNotExist) {
+							fmt.Printf("5 %s does not exist", configFile)
+						}
+					}
+				}
+			}
+		}
+
 		err := recconf.LoadConfig(configFile)
 		if err != nil {
 			panic(err)
