@@ -19,13 +19,13 @@ type Config struct {
 func getApolloInfo() *config.AppConfig {
 	var ip string
 	var secret string
-	namespace := "a012_infer.json"
+	namespace := " a030_recommender.json"
 
 	env := os.Getenv(ENV_APOLLO_URL)
 	if env == "" {
 		ip = "http://dev-tanka-sg-apollo-config.aws.tankaapps.com:80"
 		secret = "d4d279eb0f5040d7b9fb3ab79c6d5d1f"
-		namespace = "a012_infer_local.json"
+		namespace = " a030_recommender_local.json"
 	} else {
 		// this golang app is using .json config instead of .properties which is used by python
 		// the ip should use http://dev-tanka-sg-apollo-config.aws.tankaapps.com:80 instead of
