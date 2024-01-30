@@ -9,7 +9,6 @@ import (
 	"github.com/alibaba/pairec/datasource/graph"
 	"github.com/alibaba/pairec/datasource/hbase_thrift"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/alibaba/pairec/abtest"
 	"github.com/alibaba/pairec/algorithm"
 	"github.com/alibaba/pairec/config"
@@ -37,6 +36,7 @@ import (
 	"github.com/alibaba/pairec/service/recall/berecall"
 	"github.com/alibaba/pairec/sort"
 	"github.com/alibaba/pairec/web"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	_ "go.uber.org/automaxprocs"
 )
 
@@ -68,6 +68,7 @@ func Run() {
 		ListenConfig(configName)
 	} else {
 		// load config from local file
+		configFile = "./conf/recommend_config_local.json"
 		err := recconf.LoadConfig(configFile)
 		if err != nil {
 			panic(err)
