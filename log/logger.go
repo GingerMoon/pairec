@@ -62,7 +62,16 @@ func NewLogger() *zap.Logger {
 
 	var logger *zap.Logger
 	if debug {
-		fileSync, closeAll, err := zap.Open(prodCfg.OutputPaths...)
+		// for local debugging only!!!
+		// 1. no err sink to file, only info.
+		// 2. missing `nlp_name` and `namespace` for example.
+		fileSink := make([]string, 0, len(prodCfg.OutputPaths))
+		for _, path := range prodCfg.OutputPaths {
+			if path != "stdout" && path != "stderr" {
+				fileSink = append(fileSink, path)
+			}
+		}
+		fileSync, closeAll, err := zap.Open(fileSink...)
 		if err != nil {
 			closeAll()
 			panic("failed to open files" + prodCfg.OutputPaths[0])
@@ -72,11 +81,12 @@ func NewLogger() *zap.Logger {
 		devCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
 
 		consoleEncoder := zapcore.NewConsoleEncoder(devCfg)
+
 		prodCfg.EncoderConfig.EncodeCaller = zapcore.FullCallerEncoder
 		fileEncoder := zapcore.NewJSONEncoder(prodCfg.EncoderConfig)
 
 		core := zapcore.NewTee(
-			zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), prodCfg.Level),
+			zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stderr), prodCfg.Level),
 			zapcore.NewCore(fileEncoder, fileSync, prodCfg.Level),
 		)
 
