@@ -42,7 +42,7 @@ func randStr(n int) string {
 
 func NewLogger() *zap.Logger {
 	env := os.Getenv(ENV_APOLLO_URL)
-	if env != "" {
+	if env != "" && prodCfg != nil {
 		// required by devops team
 		path := prodCfg.OutputPaths[0]
 		segments := strings.Split(path, ".log")
@@ -60,6 +60,12 @@ func NewLogger() *zap.Logger {
 		prodCfg.OutputPaths[0] = path
 	}
 
+	// where apollo not available
+	if prodCfg == nil {
+		cfg := zap.NewDevelopmentConfig()
+		prodCfg = &cfg
+	}
+
 	var logger *zap.Logger
 	if debug {
 		// for local debugging only!!!
@@ -74,7 +80,7 @@ func NewLogger() *zap.Logger {
 		fileSync, closeAll, err := zap.Open(fileSink...)
 		if err != nil {
 			closeAll()
-			panic("failed to open files" + prodCfg.OutputPaths[0])
+			panic("failed to open files")
 		}
 
 		devCfg := zap.NewDevelopmentEncoderConfig()
