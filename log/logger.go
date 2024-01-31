@@ -12,16 +12,24 @@ import (
 )
 
 const (
-	ENV_APOLLO_URL = "apollo_apollo_meta"
+	ENV_APOLLO_URL   = "apollo_apollo_meta"
+	ENV_PAIREC_DEBUG = "PAIREC_DEBUG"
 )
 
 var (
-	cfg     *zap.Config
+	prodCfg *zap.Config
+	debug   bool
 	letters = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 )
 
 func SetConfig(logConfig *zap.Config) {
-	cfg = logConfig
+	prodCfg = logConfig
+	isDebug := os.Getenv(ENV_PAIREC_DEBUG)
+	if isDebug != "" {
+		debug = true
+	} else {
+		debug = false
+	}
 }
 
 func randStr(n int) string {
@@ -36,7 +44,7 @@ func NewLogger() *zap.Logger {
 	env := os.Getenv(ENV_APOLLO_URL)
 	if env != "" {
 		// required by devops team
-		path := cfg.OutputPaths[0]
+		path := prodCfg.OutputPaths[0]
 		segments := strings.Split(path, ".log")
 		path = segments[0] + "_" + randStr(10) + ".log"
 		for i := 1; i < len(segments); i++ {
@@ -49,11 +57,11 @@ func NewLogger() *zap.Logger {
 			panic("failed to make log dir " + logPath)
 		}
 
-		cfg.OutputPaths[0] = path
+		prodCfg.OutputPaths[0] = path
 	}
 
-	cfg.EncoderConfig.EncodeCaller = zapcore.FullCallerEncoder
-	logger := zap.Must(cfg.Build())
+	prodCfg.EncoderConfig.EncodeCaller = zapcore.FullCallerEncoder
+	logger := zap.Must(prodCfg.Build())
 	defer logger.Sync()
 
 	logger.Info("logger construction succeeded")
